@@ -35,22 +35,44 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void pauseJob(String jobClassName, String jobGroupName) {
-
+        try {
+            scheduler.pauseJob(JobKey.jobKey(jobClassName, jobGroupName));
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override
     public void restartJob(String jobClassName, String jobGroupName) {
-
+        try {
+            scheduler.resumeJob(JobKey.jobKey(jobClassName, jobGroupName));
+        } catch (SchedulerException e) {
+         log.error("resume error {}", e.getMessage());
+         throw new RuntimeException("resume 错误");
+        }
     }
 
     @Override
     public void updateJob(String jobClassName, String jobGroupName, String cronExpression) {
-
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey(jobClassName, jobGroupName);
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
+            CronTrigger cronTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+            cronTrigger = cronTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+            scheduler.rescheduleJob(triggerKey, cronTrigger);
+        } catch (SchedulerException ex) {
+            log.error("update error {}", ex.getMessage());
+            throw new RuntimeException("更新定时任务失败");
+        }
     }
 
     @Override
     public void deleteJob(String jobClassName, String jobGroupName) {
-
+        try {
+            scheduler.deleteJob(JobKey.jobKey(jobClassName, jobGroupName));
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     protected static BaseJob getClass(String jobClassName) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
