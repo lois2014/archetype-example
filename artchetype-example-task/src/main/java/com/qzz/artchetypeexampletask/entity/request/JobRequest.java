@@ -3,7 +3,7 @@ package com.qzz.artchetypeexampletask.entity.request;
 import lombok.Data;
 
 @Data
-public class JobAddRequest {
+public class JobRequest {
     private String jobClassName;
 
     private String jobGroupName;
