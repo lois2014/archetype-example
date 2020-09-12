@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: rabbitmq-example-provider
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: root
+    password: root
+    virtual-host: root-vhost
+    publisher-returns: true
+    publisher-confirm-type: correlated
+    listener:
+      type: simple
+      simple:
+        acknowledge-mode: manual
+server:
+  port: 8889
